@@ -1,0 +1,12 @@
+.vs/
+bin/
+obj/
+Debug/
+Release/
+*.exe
+*.log
+*.obj
+*.user
+*.tlog
+*.idb
+
