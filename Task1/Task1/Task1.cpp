@@ -5,10 +5,18 @@ using namespace std;
 using namespace chrono;
 // функція виведення масиву
 void printArray(int arr[], int n) {
-    // функція приймає масив і його розмір
-    // використовується для виводу всіх елементів масиву на екран
-    for (int i = 0; i < n; i++) {
-        cout << arr[i] << " ";
+    if (n <= 10) {
+        for (int i = 0; i < n; i++)
+            cout << arr[i] << " ";
+    }
+    else {
+        for (int i = 0; i < 5; i++)
+            cout << arr[i] << " ";
+
+        cout << "..." << n - 10 << " ... ";
+
+        for (int i = n - 5; i < n; i++)
+            cout << arr[i] << " ";
     }
     cout << endl;
 }
@@ -81,63 +89,73 @@ int main() {
         int n = sizes[k];
         int* arr = new int[n];
         generateArray(arr, n);
-        //insertion
+
+        cout << "\n" << n << "\n";
+        cout << "Original array: ";
+        printArray(arr, n);
+        //insertion sync
         int* a1 = new int[n];
         copy(arr, arr + n, a1);
         auto start = high_resolution_clock::now();
         insertionSort(a1, n);
         auto end = high_resolution_clock::now();
-        cout << "Insertion n=" << n << " time="
-            << duration_cast<milliseconds>(end - start).count()
-            << " ms\n";
+        cout << "Insertion (SYNC): "<< duration_cast<milliseconds>(end - start).count()<< " ms\n";
         delete[] a1;
-        //selection
+        //insertion async
+        int* a1a = new int[n];
+        copy(arr, arr + n, a1a);
+        start = high_resolution_clock::now();
+        auto f1 = async(launch::async, insertionSort, a1a, n);
+        f1.get();
+        end = high_resolution_clock::now();
+        cout << "Insertion (ASYNC): "<< duration_cast<milliseconds>(end - start).count()<< " ms\n";
+        delete[] a1a;
+        //selection sync
         int* a2 = new int[n];
         copy(arr, arr + n, a2);
         start = high_resolution_clock::now();
         selectionSort(a2, n);
         end = high_resolution_clock::now();
-        cout << "Selection n=" << n << " time="
-            << duration_cast<milliseconds>(end - start).count()
-            << " ms\n";
+        cout << "Selection (SYNC): "<< duration_cast<milliseconds>(end - start).count()<< " ms\n";
         delete[] a2;
-        //shell
+        //selection async
+        int* a2a = new int[n];
+        copy(arr, arr + n, a2a);
+        start = high_resolution_clock::now();
+        auto f2 = async(launch::async, selectionSort, a2a, n);
+        f2.get();
+        end = high_resolution_clock::now();
+        cout << "Selection (ASYNC): "<< duration_cast<milliseconds>(end - start).count()<< " ms\n";
+        delete[] a2a;
+        //shell sync
         int* a3 = new int[n];
         copy(arr, arr + n, a3);
         start = high_resolution_clock::now();
         shellSort(a3, n);
         end = high_resolution_clock::now();
-        cout << "Shell n=" << n << " time="
-            << duration_cast<milliseconds>(end - start).count()
-            << " ms\n";
+        cout << "Shell (SYNC): "<< duration_cast<milliseconds>(end - start).count()<< " ms\n";
         delete[] a3;
-        //async shell
-        int* a4 = new int[n];
-        copy(arr, arr + n, a4);
+        //shell async
+        int* a3a = new int[n];
+        copy(arr, arr + n, a3a);
         start = high_resolution_clock::now();
-        auto f = async(launch::async, shellSort, a4, n);
-        // запуск сортування в окремому потоці
-        f.get();
-        // очікування завершення
+        auto f3 = async(launch::async, shellSort, a3a, n);
+        f3.get();
         end = high_resolution_clock::now();
-        cout << "Async Shell n=" << n << " time="
-            << duration_cast<milliseconds>(end - start).count()
-            << " ms\n";
-        delete[] a4;
+        cout << "Shell (ASYNC): " << duration_cast<milliseconds>(end - start).count()<< " ms\n";
+        delete[] a3a;
         //binary search
         shellSort(arr, n);
         int x;
         cout << "Enter element: ";
         cin >> x;
-        // користувач вводить число для пошуку
         int res = binarySearch(arr, n, x);
         if (res != -1)
             cout << "Found at index " << res << endl;
         else
             cout << "Not found\n";
         delete[] arr;
-        cout << "----------------------\n";
+        cout << "\n";
     }
     return 0;
 }
-//task 1 update
